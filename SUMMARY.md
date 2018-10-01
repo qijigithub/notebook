@@ -1,5 +1,5 @@
 # Table of contents
 
-* [CSC 447:programming language conception](README.md)
+* [CSC 447:programming language conception](447.md)
 
-* [meachine learning]
+* [meachine learning](478.md)
