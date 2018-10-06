@@ -1,5 +1,5 @@
 # Table of contents
 
-* [CSC 447:programming language conception](447.md)
+* [python basic](README.md)
+* [Python](python.md)
 
-* [meachine learning](478.md)
