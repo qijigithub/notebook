@@ -620,7 +620,47 @@ int length_while_int_ptr (node_int_ptr *xs) {
 }
 ```
 
-Use `(void *)` type in C,Can cast/store any pointer type at type `(void *)`But it must cast from `(void *)` before dereferencing 
+Use `(void *)` type in C,Can cast/store any pointer type at type `(void *)`But it must cast from `(void *)` before dereferencing. Problem on downcasting, which will cause shape error.
+
+* generic type in Java
+  * problem: Downcasting will cause shape error but never reach shape error
+
+```java
+static class Node {
+  Object item;
+  Node next;
+}
+
+Node xs = ...           // filled with java.io.InputStream elements
+Object p = xs.item;     // OK
+String q = (String) p;  // runtime ClassCastException halts execution
+q.endsWith ("a");       // never reach shape error
+```
+
+* the right generic type: could use any type as parameter and don't need to downcast
+
+```java
+static class Node<X> {
+  X item;
+  Node<X> next;
+
+  public Node (X item, Node<X> next) { 
+    this.item = item; 
+    this.next = next; 
+  }
+}
+
+static <X> int length (Node<X> xs) {
+  if (xs == null) {
+    return 0;
+  } else { 
+    return 1 + length (xs.next);
+  }
+}
+
+```
+
+
 
 
 
