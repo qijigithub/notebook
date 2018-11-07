@@ -568,6 +568,24 @@ xs match {
 }
 ```
 
+recursive function
+
+* functional programming has immutable programming, which is different from regular programming
+* wildcard\_:relative ignore head
+
+```scala
+// length: input a list,return a int
+//count
+def length [X] (xs:List[X]) : Int = xs match {
+  case Nil   => 0
+  case _::ys => 1 + length (ys)
+}
+```
+
+* List build in appending function
+* \(:::\):append between element and list
+* \(::\): append between list and list
+
 ### worksheet
 
 ### homework
@@ -577,6 +595,40 @@ xs match {
 ## Lecture3
 
 ### class notes
+
+#### background knowledge:parametric polymorphism
+
+* 😂why using generic type: for no need to overload one function for every type of parameter, the object in java could be used, but when specify type, we have to downcast and downcasting will cause shape error, so Java create generic type.
+* generic linked list in C
+
+```c
+//Use (void *) type in C
+typedef struct node_int_ptr node_int_ptr;
+
+struct node_int_ptr {
+  int *item;
+  node_int_ptr *next;
+};
+
+int length_while_int_ptr (node_int_ptr *xs) {
+  int result = 0;
+  while (xs) {
+    result += 1;
+    xs = xs->next;
+  }
+  return result;
+}
+```
+
+Use `(void *)` type in C,Can cast/store any pointer type at type `(void *)`But it must cast from `(void *)` before dereferencing 
+
+
+
+#### function programming
+
+#### for expression
+
+
 
 ### worksheet
 
@@ -597,4 +649,45 @@ xs match {
 ### homework
 
 ### quiz
+
+## Sala method
+
+* List method
+
+```scala
+// isEmpty:input a list return boolean, spliting to two situation
+// if list has element return true, else return false
+def isEmpty [X] (xs:List[X]) : Boolean = xs match {
+  case Nil   => true
+  case y::ys => false
+}
+```
+
+```scala
+//head: input a list return a element of list(head)
+//return first element of list, else throw exception
+def head [X] (xs:List[X]) : X = xs match {
+  case Nil   => throw new NoSuchElementException ()
+  case y::ys => y
+}
+```
+
+```scala
+//tail:input a list return a list(without head)
+//return all element without head, else throw a exception
+def tail [X] (xs:List[X]) : List[X] = xs match {
+  case Nil   => throw new NoSuchElementException ()
+  case y::ys => ys
+}
+```
+
+```scala
+//append:intput two list with same type element,return one list
+//if list a has element, append that element with new list recursively,
+//if list a has no element, append list b to new list
+def append [X] (xs:List[X], ys:List[X]) : List[X] = xs match {
+  case Nil   => ys
+  case z::zs => z::(append (zs, ys))
+}
+```
 
