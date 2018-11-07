@@ -657,12 +657,7 @@ static <X> int length (Node<X> xs) {
     return 1 + length (xs.next);
   }
 }
-
 ```
-
-
-
-
 
 #### function programming
 
