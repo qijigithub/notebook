@@ -101,7 +101,7 @@ x=0, y=2, z=222
 
 Because function is strict, before execute function mcond, x=1, and y=2, z=111or 222. Macro call is not strict, so that the function mcond execute first when meeting b go back find the parameter b, random/2!= 0 true, and meeting t, t=1,111 and ignore y=2, 222. macro calls are evaluated in the compiler, by textual substitution.
 
-* contio!!nal  statment and condictional expression
+* conditional  statment and conditional expression
   * conditional statement
 
 ```text
@@ -125,7 +125,7 @@ int fact(int n){
 
 Because  conditional expression use expression and didn't use statement.
 
-* undfined behavior
+* undefined behavior
   * under/overflow
 
 ```text
@@ -185,6 +185,30 @@ it runs in clang, the compiler gives a warning because it is not run in the righ
 
 * dangling pointers
 
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+int* foo (int n) {
+  int result = 2 * n;
+  return &result;
+}
+
+int main () {
+  int* p = foo (5);
+  int* q = foo (7);
+  printf ("%x %d\n", p, *p);
+  printf ("%x %d\n", q, *q);  
+}
+output: 
+in clang: 
+14 and big number
+in gcc:
+segment error
+```
+
+p and q in main function point into an activation record, which is stack, and when the function executing finished, the memory of that function will be deallocated.
+
 #### scheme
 
 * literal
@@ -212,11 +236,11 @@ it runs in clang, the compiler gives a warning because it is not run in the righ
     * regular list:\(cons 1 \(cons 2 \(cons 3 \(\)\)\)\)
 
   * list
-    * list only has one strcuture type: the pair
+    * list only has one structure type: the pair
     * a non-empty list is just a special type of pair
     * pairs are a kind of symbolic-expression
 
-* syntacitc sugar for lists
+* syntax sugar for lists
 
   * quote: special form prevent evaluation: \(quote \(1 2 3\)\)
   * ' :shorthand for quote '\(1 2 3\)
@@ -224,7 +248,7 @@ it runs in clang, the compiler gives a warning because it is not run in the righ
 
 * equals problem
   * eq? compares two pointers are same, same to java ==
-  * equal? compares two structure are samesame to java equals
+  * equal? compares two structure are same to java equals
 * read-eval-print loop
   * quote:delay evaluation
   * eval: evaluates an expression
@@ -281,7 +305,7 @@ Typing01.java:5: error: bad operand types for binary operator '-'
 
 * Language : C, Java, Scala, Haskell, Rust, Coq, etc
 
-```text
+```c
 int main () {
   char a[] = { 0x85, 0x86, 0x87, 0x88 };
   int b = a[0];
@@ -297,7 +321,7 @@ if char convert to int, it is allowed, but if the pointer of char convert to the
 
 Different from the code above,  we can use upcast, it gets this to compile but a\[0\] will be wrong value.
 
-```text
+```c
 int main () {
   char a[] = { 0x85, 0x86, 0x87, 0x88 };
   int b = a[0];
@@ -345,7 +369,7 @@ f=-316912650057057350374175801344.000000 a[0]=10 i=47
 When stack of main has 3 variables, f, a\[\], and i, when a\[-1\] is assigned, it change i, and when executing update function, the address of a is as parameter of the function the address a+1 is changed, which original belong to i, so i is changed.
 
 * strong and weak
-  * strong type guaratees no shape errors\(upcasting or downcasting ,and array problem causes imcompatible type\)
+  * strong type guaratees no shape errors\(upcasting or downcasting ,and array problem causes incompatible type\)
   * weak type may permit shape error
 
 ```text
@@ -370,7 +394,7 @@ ouch!
 
 UnsafeCommand function print ouch!, safeCommand function print hurray!, guess ,using ouch!-hurray!=-48, the main function print guess\(\) result, which is -48, and save safeCommand function in a pointer c. When invoking function c\(\), the result is hurray!, and add -48 to c\(\), the result is ouch!  In this way, if your guess function is correct you could call anything, super unsafe. 
 
-😂: That is shape error: reading memory in an incompatible type or data used ocntrary to type. However c is weak type, so it could run and no warning and error message.
+😂: That is shape error: reading memory in an incompatible type or data used contrary to type. However c is weak type, so it could run and no warning and error message.
 
 ```
 void floatCommand (float f) { printf ("f=%f\n", f); }
@@ -392,10 +416,10 @@ i=-260046848
 f=-316912650057057350374175801344.000000
 ```
 
-function floatCommand take a float number and return, intCommand function take a int and return, guess\(\) return the floatCommand address- upcastinf intCommand address. In the main funciton guess retrun -64, and j is the number -260046848, intCommand function is store in a pointer c, c take a int number and return correct number, when c is try to become floatCommand, it return an incorrect number.
+function floatCommand take a float number and return, intCommand function take a int and return, guess\(\) return the floatCommand address- upcasting intCommand address. In the main function guess return -64, and j is the number -260046848, intCommand function is store in a pointer c, c take a int number and return correct number, when c is try to become floatCommand, it return an incorrect number.
 
 * Strong and static language
-  * Java, C\#, Scala, Rust,etc
+  * Java, C\#, Scala, Rust, etc
 * weak  and static language
   * C
 * Strong and dynamic language
@@ -444,6 +468,104 @@ class Typing03 {
 output:
 javac Typing03.java && java Typing03
 Exception in thread "main" java.lang.ArrayStoreException: C
+```
+
+the main function create a new array, B type with 2 length,  and upcast array to A type, as\[0\] is the first cell are defined to C type, it is not allowed, and set b to bs\[0\],which is as\[0\].One array contains two type of element, which is not allowed.
+
+```text
+class A { int x; }
+class B extends A { float y; }
+class C extends A { char c; }
+
+class Typing04 {
+  public static void main (String[] args) {
+    B[] bs = new B[4];
+    C c = new C();
+    B b = bs[-1];
+  }  
+}
+
+output:
+javac Typing04.java && java Typing04
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: -1
+```
+
+Class B and C extend Class A. In main function,  A b type array are initialized,  and a variable c is c type, b  is bs\[-1\], which is out of the bound of array bs. 
+
+```text
+class A { int x; }
+class B extends A { float y; }
+class C extends A { char c; }
+
+class Typing05 {
+  static void f (B b) {
+    A a = b;       // upcast
+  }
+  static void g (A a) {
+    B b = (B) a;   // downcast
+  }
+  public static void main (String[] args) {
+      f (new B());
+      g (new C());
+  }  
+}
+
+output:
+javac Typing05.java && java Typing05
+Exception in thread "main" java.lang.ClassCastException: C cannot be cast to B
+```
+
+function f is for upcasting, function g is for downcasting. In the main, g take a C type  parameter treated as A type, and down casting to B type, it is not allowed.
+
+* 😂 dynamic checking in java: what is checking for? 
+
+  * the error which is not syntax error and not operator error which static checking could detected
+  * such as array out of bounds exception, dividing 0 exception, stack overflow or array overflow exception, which is not error but will cause problem. In c it is called undefined behavior.
+
+* 😂 Why java restrict use of pointers, instead using garbage collection?
+  * if use pointer, user have to free the memory to deallocate, which will reuse the memory using before and cause safety problem.
+
+#### Scala introduction
+
+* Scala： functional and object-oriented PL
+  * Boolean, numeric, and string
+  * static type checking
+* variable:
+  * immutable variable: val x=10
+  * mutable variable: var x=10
+* expression oriented:no statements, like scheme, ML, etc
+* comma expression:{e\_1;e\_2;e\_3...;e\_n} or {e\_1 e\_2 e\_3... e\_n}
+* method：
+  * def plus\(x:Int, y:Int\): Int=x+y
+  * def also could use to define global variable
+* Object: everything is object in Scala
+  * 5.toDouble
+  * 5.+\(5\) or 5+6
+  * 5.max\(6\) or 5 max 6
+* tuple: Immuable
+  * val x:\(Int, String\)=\(5,"hello"\)
+* Linked List:varying number of homogeneous items
+  * \(cons 1\(cons 2 \(\)\)\)
+  * 1：：（2：：Nil）
+  * List（1，2，3）
+  * xs.head; xs.tail
+  * wrong mistake: xs\(1\)=7
+* pattern matching
+
+```scala
+//pattern matching
+val p : (Int, String) = // ...
+p match {
+  case (x, y) => "Int is %d".format (x)
+}
+```
+
+```text
+val xs : List[Int] = // ...
+xs match {
+  case Nil   => "List is empty"
+  case y::ys => "List is non-empty, head is %d".format (y)
+}
 ```
 
 ### worksheet
