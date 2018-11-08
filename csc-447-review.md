@@ -369,7 +369,7 @@ f=-316912650057057350374175801344.000000 a[0]=10 i=47
 When stack of main has 3 variables, f, a\[\], and i, when a\[-1\] is assigned, it change i, and when executing update function, the address of a is as parameter of the function the address a+1 is changed, which original belong to i, so i is changed.
 
 * strong and weak
-  * strong type guaratees no shape errors\(upcasting or downcasting ,and array problem causes incompatible type\)
+  * strong type guarantees no shape errors\(upcasting or downcasting ,and array problem causes incompatible type\)
   * weak type may permit shape error
 
 ```text
@@ -661,6 +661,19 @@ static <X> int length (Node<X> xs) {
 
 #### function programming
 
+* function and method
+
+```scala
+def a (x:Int) = x + 1; //method a
+val b = (x:Int) => x + 1; //anonymous function
+val c : (Int => Int) = (x) => x + 1;// anonymous function with a parameter x
+val d = new Function[Int,Int] { def apply(x:Int) = x + 1 } // function oject with apply method
+object e extends Function1[Int, Int] { def apply(x:Int) = x + 1; }
+val f : PartialFunction[Any, Int]  = { case i: Int ⇒ i + 1 }
+```
+
+function is an object, when executing function, function are implemented as object with method apply,  aka function will convert to method and execute\(function.apply\(\)\) .method is just method. 
+
 #### for expression
 
 
@@ -725,4 +738,20 @@ def append [X] (xs:List[X], ys:List[X]) : List[X] = xs match {
   case z::zs => z::(append (zs, ys))
 }
 ```
+
+```scala
+//foreach:input a list with any type and a function take list element and return unit
+//take first
+def foreach [X] (xs:List[X], f:X=>Unit) : Unit = {
+  xs match {
+    case Nil   => ()
+    case y::ys => { 
+      f (y)
+      foreach (ys, f)
+    }
+  }
+}
+```
+
+
 
