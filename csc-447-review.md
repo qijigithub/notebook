@@ -674,11 +674,13 @@ val f : PartialFunction[Any, Int]  = { case i: Int ⇒ i + 1 }
 
 function is an object, when executing function, function are implemented as object with method apply,  aka function will convert to method and execute\(function.apply\(\)\) .method is just method. 
 
- Build-infunciton use
-
-* for each
-  * xs.foreach\(\(x:X\)=&gt;println\(x\)\)
-  * foreach\(xs,\(x:X\)=&gt;println\(x\)\)
+* Build-in function use
+  * for each, transform, map, identity
+* recursion, function could be a parameter,
+  * pass named function\(printElt\) to foreach: foreach \(xs, printElt\)
+  * pass anonymous function to foreach:foreach \(xs, \(x:Int\) =&gt; println \("%02d".format\(x\)\)\)
+    * xs.foreach\(\(x:X\)=&gt;println\(x\)\)
+    * foreach\(xs,\(x:X\)=&gt;println\(x\)\)
 * transform, map build in or write by yourself
 * identity
 * 
@@ -799,6 +801,16 @@ def identity [X] (xs:List[X]) : List[X] = {
   xs match {
     case Nil   => Nil
     case y::ys => y :: identity (ys)
+  }
+}
+```
+
+```text
+def filter [X] (xs:List[X], f:X=>Boolean) : List[X] = {
+  xs match {
+    case Nil            => Nil
+    case y::ys if f (y) => y :: filter (ys, f)
+    case _::ys          => filter (ys, f)
   }
 }
 ```
