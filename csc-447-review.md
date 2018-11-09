@@ -681,7 +681,7 @@ function is an object, when executing function, function are implemented as obje
   * foreach\(xs,\(x:X\)=&gt;println\(x\)\)
 * transform, map build in or write by yourself
 * identity
-
+* 
 #### for expression
 
 ### worksheet
