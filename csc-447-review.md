@@ -583,8 +583,8 @@ def length [X] (xs:List[X]) : Int = xs match {
 ```
 
 * List build in appending function
-* \(:::\):append between element and list
-* \(::\): append between list and list
+* \(:::\):append between list and list
+* \(::\): append between element and list
 
 ### worksheet
 
@@ -674,9 +674,15 @@ val f : PartialFunction[Any, Int]  = { case i: Int ⇒ i + 1 }
 
 function is an object, when executing function, function are implemented as object with method apply,  aka function will convert to method and execute\(function.apply\(\)\) .method is just method. 
 
+ Build-infunciton use
+
+* for each
+  * xs.foreach\(\(x:X\)=&gt;println\(x\)\)
+  * foreach\(xs,\(x:X\)=&gt;println\(x\)\)
+* transform, map build in or write by yourself
+* identity
+
 #### for expression
-
-
 
 ### worksheet
 
@@ -698,7 +704,7 @@ function is an object, when executing function, function are implemented as obje
 
 ### quiz
 
-## Sala method
+## Scala method
 
 * List method
 
@@ -741,7 +747,7 @@ def append [X] (xs:List[X], ys:List[X]) : List[X] = xs match {
 
 ```scala
 //foreach:input a list with any type and a function take list element and return unit
-//take first
+//take first element into f function and recursively do this
 def foreach [X] (xs:List[X], f:X=>Unit) : Unit = {
   xs match {
     case Nil   => ()
@@ -753,5 +759,47 @@ def foreach [X] (xs:List[X], f:X=>Unit) : Unit = {
 }
 ```
 
+```scala
+// sum: input a list of Int and return a sum of them
+//using a variable inside sum, and for each function, sum every element in the list with result and print result
+def sum (xs:List[Int]) : Int = {
+  var result = 0
+  xs.foreach ((x:Int) => result = result + x)
+  result
+}
+```
 
+```scala
+// transform: input a list of someting and resturn a list of otherthing.
+//take the first element and transform it and then recursively do that
+def transform (xs:List[Int]) : List[String] = {
+  xs match {
+    case Nil   => Nil
+    case y::ys => ("%02d".format (y)) :: transform (ys)
+  }
+}
+```
+
+```scala
+//map: input a list of X and return a list of Y
+//take the first element into f function and recursively do that,
+//which is map the element to f function
+def map [X,Y] (xs:List[X], f:X=>Y) : List[Y] = {
+  xs match {
+    case Nil   => Nil
+    case y::ys => f (y) :: map (ys, f)
+  }
+}
+```
+
+```scala
+//identity: input a list of X return same list of X
+//
+def identity [X] (xs:List[X]) : List[X] = {
+  xs match {
+    case Nil   => Nil
+    case y::ys => y :: identity (ys)
+  }
+}
+```
 
