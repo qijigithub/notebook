@@ -757,7 +757,7 @@ foldright(0,xs,(z:Int,x:Int)=>z+x)
   * for\(x&lt;-xs;if\(x%2!=0\)\) yield\(2\*x\)
 * flatten operation and for expression
 
-```text
+```scala
 def flatten [X] (xs:List[List[X]]) : List[X] = xs match {
   case Nil   => Nil
   case y::ys => y ::: flatten(ys)
@@ -765,7 +765,9 @@ def flatten [X] (xs:List[List[X]]) : List[X] = xs match {
 ```
 
 * \(for \(xs &lt;- xss; x &lt;- xs\) yield x\) == \(1 to 10\).toList
-  * flatten function is same to for look version above, which  take a 
+  * flatten function is same to for look version above, which  take a list of list and return a list of element.
+
+#### option type
 
 ### worksheet
 
@@ -923,12 +925,23 @@ val xss = List(List(1,2,3),List(4,5,6,7),List(8,9),List(10))
 foldRight (xss, 0, (xs:List[Int],z:Int)=>xs.length + z)
 ```
 
-```text
-//
-
+```scala
+//flatten: input a list of list and return a list of element
+//using concatenate notation to connect element and list
 def flatten [X] (xs:List[List[X]]) : List[X] = xs match {
   case Nil   => Nil
   case y::ys => y ::: flatten(ys)
+}
+```
+
+```scala
+//flatMap: input a List of X and a function, which change X to a list and return list
+//pass a list of element to f function and return a list and combine with other list
+def flatMap [X,Y] (xs:List[X], f:X=>List[Y]) : List[Y] = {
+  xs match {
+    case Nil   => Nil
+    case y::ys => f (y) ::: flatMap (ys, f)
+  }
 }
 ```
 
