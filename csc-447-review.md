@@ -785,8 +785,24 @@ def safeDivide (m:Int, n:Int) : Option[Int] = {
 
 * 😂why : key is return a "none" value when it is needed, for example, when m/n && n=0
 * Java deal with this : Java will throw a exception 
-* when: distinguish value one same type.
-* 
+* when: 
+  * distinguish value one same type.
+    * -1 for bytes read
+    * null reference for reference type: C c=new C\(\)
+    * NULL pointer for pointers types: a\[-1\]
+  * exceptions
+* example
+
+```scala
+def index[X](xs:List[X],n:Int):Option[X]=> {
+    xs match{
+        case Nil=>None
+        case y::_=>if n==0=>Some(y)
+        case _::ys=> index(ys,n-1)
+    }
+}
+```
+
 ### worksheet
 
 ### homework
