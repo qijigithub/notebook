@@ -769,6 +769,24 @@ def flatten [X] (xs:List[List[X]]) : List[X] = xs match {
 
 #### option type
 
+* Type-safe and principled approach to missing data
+  * Example of option type\[Int\]: None,  Some\(5\)
+
+```scala
+//safeDivide: input m and n and return m/n, the special case is when n=0, thus, using
+//option type to make sure every situation is safe.
+def safeDivide (m:Int, n:Int) : Option[Int] = {
+  if (n == 0) 
+    None
+  else
+    Some (m / n)
+}
+```
+
+* 😂why : key is return a "none" value when it is needed, for example, when m/n && n=0
+* Java deal with this : Java will throw a exception 
+* when: distinguish value one same type.
+* 
 ### worksheet
 
 ### homework
