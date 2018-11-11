@@ -675,16 +675,97 @@ val f : PartialFunction[Any, Int]  = { case i: Int ⇒ i + 1 }
 function is an object, when executing function, function are implemented as object with method apply,  aka function will convert to method and execute\(function.apply\(\)\) .method is just method. 
 
 * Build-in function use
-  * for each, transform, map, identity
-* recursion, function could be a parameter,
+  * for each is new control structure for list, based on for each to improve other function
+  * foreach, sum, transform, map, identity,filter
+* recursion, function could be a parameter, own function
   * pass named function\(printElt\) to foreach: foreach \(xs, printElt\)
-  * pass anonymous function to foreach:foreach \(xs, \(x:Int\) =&gt; println \("%02d".format\(x\)\)\)
     * xs.foreach\(\(x:X\)=&gt;println\(x\)\)
     * foreach\(xs,\(x:X\)=&gt;println\(x\)\)
-* transform, map build in or write by yourself
-* identity
-* 
+  * pass anonymous function to foreach:foreach \(xs, \(x:Int\) =&gt; println \("%02d".format\(x\)\)\)
+* foldleft and foldright understanding
+  * sum to foldleft: use tail recursion
+
+```scala
+def sum(xs:List[Int],z:Int=0): Int=>{
+    case Nil=>Nil
+    case y::ys=> sum(ys,y+z)
+}
+val xs = List(11,21,31)
+sum (xs)
+```
+
+* * FoldLeft: tail recursion
+
+```scala
+def foldleft [Z,X](z:Z,xs:List[X],f((Z,X)=>Z)): Z=>{
+    case Nil=>Nil
+    case y::ys=>foldleft(f(z,y),ys,f)
+}
+foldleft(0,xs,(z:Int,x:Int)=>z+x)
+```
+
+* * sum to foldright:non-tail recursion
+
+```scala
+def sum2 (xs:List[Int],z:Int=0):Int=>{
+    case Nil=>Nil
+    case y::ys=>y+sum(ys,z)
+}
+val xs = List(11,21,31)
+sum (xs)
+```
+
+* * FoldRight: non-tail recursion
+
+```scala
+def foldright [Z,X] (z:Z,xs:List[X],f(Z,X)=>Z):Z={
+    case Nil=>Nil
+    case y::ys=>f(z,foldright(z,ys,f))
+}
+foldright(0,xs,(z:Int,x:Int)=>z+x)
+```
+
+* * foldleft and foldright:
+    * `foldLeft` is tail recursive: each iteration applies `f` to the next value and the accumulated result; recursive call is the result
+    * `foldRight` is recursive into an argument: each iteration applies `f` to the next value and the result of recursively folding the rest of the list
+* buildin folds
+  * xss.foldLeft \(0\) \(\(z,xs\)=&gt;z + xs.length\)
+  * xss.foldLeft\(0\)\(f\) == \(0 /: xss\)\(f\) :foldLeft \(xs, z, f\) === f\( f\( f\( f\(z, a\), b\), c\)\)
+  * xss.foldRight\(0\)\(f\) == \(xss :\ 0\)\(f\):foldRight\(xs, z, f\) === f\(a, f\(b, f\(c, z\)\)\)
+* 😂
+  * foldleft:xs:\(a,b,c\)=&gt;z+a+b+c..
+  * foldright:xs\(a,b,c\)=&gt;z+..+c+b+a
+* currying
+  * xss.foldLeft \(z, f\)=&gt;xss.foldLeft \(z\) \(f\)
+* high order function
+  * `foreach`, `map`, `filter` are higher-order functions, because they take other functions as arguments
+* functional programming
+  * function are first class,create/passed as runtime,sometime sides effct is banned
+  * first class: declared with in any scope, pass as a arguments to other functions, returns as result of functions
+* object oriented programming
+  * objects are first class,create/passed at runtime
+
 #### for expression
+
+* set comprehensions
+  * {\(m,n\)\|m{0,..,10}^n{0..,10}^m&lt;=n}
+* for \(x &lt;- xs\) sum = sum + x
+* map or foreach and for expression $$a = b$$ 
+  * for\(x&lt;-xs\) e===xs.foreach\(\(x\)=&gt;e\)
+  * for \(x &lt;- xs\) yield e === xs.map \(\(x\)=&gt;e\)
+* conditional for expression
+  * for\(x&lt;-xs;if\(x%2!=0\)\) yield\(2\*x\)
+* flatten operation and for expression
+
+```text
+def flatten [X] (xs:List[List[X]]) : List[X] = xs match {
+  case Nil   => Nil
+  case y::ys => y ::: flatten(ys)
+}
+```
+
+* \(for \(xs &lt;- xss; x &lt;- xs\) yield x\) == \(1 to 10\).toList
+  * flatten function is same to for look version above, which  take a 
 
 ### worksheet
 
@@ -796,7 +877,7 @@ def map [X,Y] (xs:List[X], f:X=>Y) : List[Y] = {
 
 ```scala
 //identity: input a list of X return same list of X
-//
+//combine y with recursive function
 def identity [X] (xs:List[X]) : List[X] = {
   xs match {
     case Nil   => Nil
@@ -805,13 +886,49 @@ def identity [X] (xs:List[X]) : List[X] = {
 }
 ```
 
-```text
+```scala
+//filter: input a list X return a filted list
+//take y to conditional argument if true return, else delete y and recursively argue next y
 def filter [X] (xs:List[X], f:X=>Boolean) : List[X] = {
   xs match {
     case Nil            => Nil
     case y::ys if f (y) => y :: filter (ys, f)
     case _::ys          => filter (ys, f)
   }
+}
+```
+
+```scala
+//foldleft:input a list, a accumulator and a function return a number
+//execute f first and then recursion: z,f,foldleft,f,foldleft
+//the recursion occur in the last step of function, parameter change as a recusion
+//it don't use too much stack memory
+def foldLeft [Z,X] (xs:List[X], z:Z, f:((Z,X)=>Z)) : Z =  xs match {
+  case Nil   => z
+  case y::ys => foldLeft (ys, f(z,y), f)
+}
+val xss = List(List(1,2,3),List(4,5,6,7),List(8,9),List(10))
+foldLeft (xss, 0, (z:Int,xs:List[Int])=>z + xs.length)
+```
+
+```scala
+//foldright:input a list,a accumulator and a fucntion return a number
+//execute recursion first then f function: foldright,foldright,foldright...,z,f,f,f,f...
+//the recusion occur before the f executing, it will use stack everytime recursion execute
+def foldRight [X,Z] (xs:List[X], z:Z, f:((X,Z)=>Z)) : Z =  xs match {
+  case Nil   => z
+  case y::ys => f (y, foldRight (ys, z, f))
+}
+val xss = List(List(1,2,3),List(4,5,6,7),List(8,9),List(10))
+foldRight (xss, 0, (xs:List[Int],z:Int)=>xs.length + z)
+```
+
+```text
+//
+
+def flatten [X] (xs:List[List[X]]) : List[X] = xs match {
+  case Nil   => Nil
+  case y::ys => y ::: flatten(ys)
 }
 ```
 
