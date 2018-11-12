@@ -903,9 +903,58 @@ object C {
 
 * * the object can only appear when following class, and only one instance of object declarations
 * Singleton in java and scala
-  * private construction so that other class cannot create object of  this class
-  * private static field, singleton type, which is the object, this only obejct
-  * public staticgetInstance function to create 
+  * singleton is for creating only one object, and other class could use the only one object
+    * private construction so that other class cannot create object of  this class, only themselves can create
+    * private static field, singleton type, which is the object, this only object, static so other class can use the only object
+    * public static getInstance function to new object so that other class could use class name to invoke method
+  * in java
+
+```java
+public class Point{
+    private static Point p;
+    private int x;
+    private int y;
+    prviate Point(int x, int y){
+     if(0 <= x && x <= 10 && 0 <= y && y <= 10){
+         this.x=x;
+         this.y=y;
+      }
+    }
+    public static Point getInstance(int x, int y){
+        if(p==null){
+            return new Point(x, y);
+        }
+        return p;
+    }
+    //other methods..
+    public void translate (int xDisp,int yDisp){
+    x=x+xDisp;
+    y=y+yDisp;
+    }
+}
+```
+
+* in scala
+
+```scala
+class Point private (private var x:Int, private var y:Int) {//private constructor and field
+  def translate (xDisp:Int, yDisp:Int) : Unit = { 
+    x = x + xDisp
+    y = y + yDisp
+  }
+}
+
+object Point {
+  def apply (x:Int, y:Int) : Point = {
+    if (0 <= x && x <= 10 && 0 <= y && y <= 10) {
+      new Point (x, y)
+    } else {
+      throw new RuntimeException ("invalid params")
+    }
+  }
+}
+
+```
 
 #### Algebraic data types
 
