@@ -784,7 +784,7 @@ def safeDivide (m:Int, n:Int) : Option[Int] = {
 ```
 
 * 😂why : key is return a "none" value when it is needed, for example, when m/n && n=0
-* Java deal with this : Java will throw a exception 
+* Java deal with this : Java will throw a exception when m/n and n==0
 * when: 
   * distinguish value one same type.
     * -1 for bytes read
@@ -803,6 +803,14 @@ def index[X](xs:List[X],n:Int):Option[X]=> {
 }
 ```
 
+* option type and null
+  * option type have something or nothing\(two possibility\)
+  * scala types represent nothing
+    * Nil: empty list
+    * None: empty option
+    * None: reference to nonthing
+    * Unit: return nothing, same to Java void
+
 ### worksheet
 
 ### homework
@@ -813,9 +821,153 @@ def index[X](xs:List[X],n:Int):Option[X]=> {
 
 ### class notes
 
-#### type
+#### Scheme loops
 
-#### scala introduction
+* with an incrementing counter argument n
+
+```scheme
+(let loop ([n 0])
+  (display (string-append "hello " (number->string n) "\n"))
+  (loop (+ n 1)))
+```
+
+#### Tail recursion
+
+* 😂why need to use tail recursion?
+  * stack:contain activation records\(AR\) for active calls, AKA stack frames
+  * why call stack:AR pushed when a function/method call is made, AR popped when a function/method returns
+  * runtime environment limit size of call stack, which will cause problem with deep recursion
+  * stack overflow: c,OS,scheme, Java, Scala
+* tail call optimization
+  * recursive function return before next recursive function start
+  * recursive call must be tail recursive
+* what:the last step of method is recursive without other operation, thus is tail recursion.
+
+#### Scala classes
+
+* scala support both FP and OOP
+
+```scala
+//scala FP
+(0 to 9).toList.partition ((x:Int) => x%3 == 0) //
+```
+
+```scala
+//scala OOP
+class Counter { //define a class
+  var n = 0  //define a field
+  def get () : Int = { val tmp = n; n = n + 1; tmp } //define a method
+}
+
+val c = new Counter  //create an object and using object to call function
+c.get
+c.get
+```
+
+* class parameters
+  * constructor :`class C (f1:Int, val f2:Int, var f3:Int) { ... }`
+    * `(f1:Int):` private val f1\(immutable\)
+    * `(val f2:Int):` public val f2\(immutable\)
+    * `(var f3:Int):` public var f3\(mutable\)
+  * How to prove private
+    * if ****other class\(not in C\) cannot call f1, c.f1 shows error message. The value have to be obtained by  get method.
+  * How to prove immutable
+    * if change the field to other number, c.f2=10 then c.f2=3 will shows error message
+* class body
+  * `class D (f1:Int)`
+* companion objects
+  * In JAVA
+
+```java
+class C {
+  int f1;
+  int m1 () { return f1; }
+  static int f2; // static field
+  static int m2 () { return f2; } //static function
+}
+```
+
+* * In Scala
+
+```java
+class C {
+  var f1:Int
+  def m1 () : Int = f1
+}
+// this part is static field and function
+object C {
+  var f2:Int
+  def m2 () : Int = f2
+}
+```
+
+* * the object can only appear when following class, and only one instance of object declarations
+* Singleton in java and scala
+  * private construction so that other class cannot create object of  this class
+  * private static field, singleton type, which is the object, this only obejct
+  * public staticgetInstance function to create 
+
+#### Algebraic data types
+
+### worksheet
+
+### homework
+
+### quiz
+
+## Lecture5
+
+### class notes
+
+### worksheet
+
+### homework
+
+### quiz
+
+## Lecture6:midterm
+
+### class notes
+
+### worksheet
+
+### homework
+
+### quiz
+
+## Lecture7
+
+### class notes
+
+### worksheet
+
+### homework
+
+### quiz
+
+## Lecture8
+
+### class notes
+
+### worksheet
+
+### homework
+
+### quiz
+
+## Lecture9
+
+### class notes
+
+### worksheet
+
+### homework
+
+### quiz
+
+## Lecture10
+
+### class notes
 
 ### worksheet
 
