@@ -1199,10 +1199,10 @@ int main (void) {
   * nested function declarations not allowed in C
 * why nested function?
   * Inner functions may be anonymous,sometimes aids clarity
-  *   Access variables from enclosing context
-
+  * Access variables from enclosing context
     * avoid duplicating parameters
     * requires some runtime support
+    * 
 
 ### worksheet
 
