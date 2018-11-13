@@ -958,6 +958,75 @@ object Point {
 
 #### Algebraic data types
 
+* algebraic data types
+  * product types: tuples
+  * sum types: tagged union
+  * eg: option type, list type
+* product type:tuple, can combine two different type of varible
+  * Named for Cartesian product of sets: X \* Y = { \(x, y\) \| x ∈ X ∧ y ∈ Y }
+  * case class: case class C\(x:Int,y:String\); val c= C\(5,"hello"\)
+  * pattern match:
+
+```text
+val n:Int = c match { 
+  case C (a, b) => a
+}
+```
+
+* How compiler treat for case class?
+
+```text
+case class C (x:Int, y:String)
+val c:C = C (5, "hello")
+val a:Int = c.x
+c.x = 6 // error: reassignment to val
+```
+
+* argument is immutable and visible, generate companion object with apply method
+* * set union
+    * Cartesian product of sets: X \* Y = { \(x, y\) \| x ∈ X ∧ y ∈ Y }
+    * union of sets: X ∪ Y = { z \| z ∈ X ∨ z ∈ Y }
+    * Coproduct or disjoint union of sets: X ⊕ Y = X ⊍ Y = { \(0, x\) \| x ∈ X } ∪ { \(1, y\) \| y ∈ Y }
+
+```scala
+trait DateSpecifier // interface
+case class Absolute (year:Int,mon:Int,day:Int) extends DateSpecifier// a class implements interface
+case class Relative (daysOffset:Int) extends DateSpecifier// another class implements interface
+
+val ds = new Array[DateSpecifier] (2) //create an array
+ds (0) = Absolute (2030, 0, 1) // Months are 0.11 // first is absolute type
+ds (1) = Relative (-5) //second is relative type
+```
+
+* recursive types
+
+```text
+//peano natural number
+trait PeanoNat
+case object Zero              extends PeanoNat
+case class  Succ (n:PeanoNat) extends PeanoNat
+```
+
+```scala
+trait List[+X]
+case object Nil                             extends List[Nothing]
+case class  Cons[+X] (head:X, tail:List[X]) extends List[X]
+
+def length [X] (xs:List[X]): Int = xs match {
+  case Nil => 0
+  case Cons(a,as) => 1 + length(as)
+}
+length (Cons (1, Cons(2, Nil)))
+```
+
+```text
+trait Tree[+X]
+case object Leaf                                 extends Tree[Nothing]
+case class  Node[+X] (l:Tree[X], c:X, r:Tree[X]) extends Tree[X]
+```
+
+*  😂: a interface has two  kind of format. For list, there are Nil and Cons. For tree, there are leaf,which has no data stored at leave and node, which data tored in interval nodes and left node and right node are tree too 
+
 ### worksheet
 
 ### homework
@@ -967,6 +1036,173 @@ object Point {
 ## Lecture5
 
 ### class notes
+
+#### scope and lifetime
+
+* scope of indentifer: region of text in which it may be used
+* common rule: local variable scope is start declaration, end until the curly bracket.
+* occurrence: occurrence situation in scope
+  * free occurrence:
+    * y=5\*x
+  * binding occurrence:
+    *  int y
+  * bound occurrence:
+    * int y; int x; x=6; y=5\*x;
+* different possible chance to use variable:
+  * normal variable, function parameters, function type parameterer\(return value\)
+  * function name: int x= a function
+  * class name
+  *  and more
+* forward declaration
+  * shadowing allowed in c and c++
+
+```c
+// f is defined before, but defined twice after g, so g may shadowed first f.
+char f (int x);
+
+char g (int x) {
+  return f (x) + f (x);
+}
+
+char f (int x) {
+  if (x > 0) { 
+    return g (x >> 8);
+  } else {
+    return 1;
+  }
+}
+```
+
+* shadowing:
+  * shadowing is not allow in java 
+
+```java
+//x is defined but defined inside scope
+public class C {
+  static void f () {
+    int x = 1;
+    {
+      int y = x + 1;
+      {
+        int x = y + 1;
+        System.out.println ("x = " + x);
+      }
+    }
+  }
+}
+$ javac C.java 
+C.java:7: error: variable x is already defined in method f()
+        int x = y + 1;
+            ^
+1 error
+```
+
+* * but field can be shadowed
+  * scala is less strict than java, and shadowing occurs in REPL naturally
+  * Althought in c variable can be shadowing, but int x=x+1 are undefined behavior.
+* Lifetime of an area of memory: duration during which it is allocated
+  * lifetime and scope: lifetime is the duration in storage\(like stack\) scope is duration in code part
+* storage option
+  * global\(static\):available for lifetime of program
+  * AR\(stack\):available while function active
+  * heap: avaible until deallocate
+* lifetime problem:
+  * lifetime is too short:
+    * cause:read return other value
+    * overwrite
+    * incorrect
+    * seurity problem
+  * lifetime is too long:
+    * use too much memory
+    * too late in freeing other resources
+  * Stack discipline
+    1. \(call f\) allocate AR for f
+    2. \(call g\) allocate AR for g
+    3. \(return from g\) deallocate AR for g
+    4. \(return from f\) deallocate AR for f
+* multiple threads
+  * each thread needs a separate call stack
+  * call and return in separate threads are independent
+* Heap allocation can use other patterns
+  1. allocate M bytes
+  2. allocate N bytes
+  3. deallocate M bytes
+  4. deallocate N bytes
+* common problem
+  * PLs with garbage collection（For Java, Scala, C\#, Python, Ruby, JS, Scheme, etc.）
+    * lifetime too long \(not GCed\)
+  * PLs with manual memory management \(C, C++\)
+    * pointers to storage whose lifetime has ended
+      * dangling pointers to an old AR
+      * dangling pointers to `free`d heap memory  \(use after free\)
+      * double `free`ing of heap memory
+* dangling pointer problem
+
+```c
+// dangling pointer-stack: when f(1) return,free f,*p is pointer to freeed erea of y's address.
+#include <stdio.h>
+#include <stdlib.h>
+
+int *f (int x) {
+  int y = x;
+  return &y;
+}
+
+int main (void) {
+  int *p = f (1);
+  printf ("*p = %d\n", *p);
+  return 0;
+}
+```
+
+```c
+//not dangling pointer: when f(1) execute,result is allocated in heap, when function return, 
+//value on heap is on there, p pointer to heap result value and print result value and return 0;
+#include <stdio.h>
+#include <stdlib.h>
+
+int *f (int x) {
+  int *result = (int *) malloc (sizeof (int));
+  *result = x;
+  return result;
+}
+
+int main (void) {
+  int *p = f (1);
+  printf ("*p = %d\n", *p);
+  return 0;
+}
+```
+
+```c
+//dangling pointer-heap: result on heap is be freed before print
+#include <stdio.h>
+#include <stdlib.h>
+
+int *f (int x) {
+  int *result = (int *) malloc (sizeof (int));
+  *result = x;
+  return result;
+}
+
+int main (void) {
+  int *p = f (1);
+  free (p);
+  printf ("*p = %d\n", *p);
+  return 0;
+}
+```
+
+#### closures
+
+* runtime support for nested function 
+  * nested function declarations not allowed in C
+* why nested function?
+  * Inner functions may be anonymous,sometimes aids clarity
+  *   Access variables from enclosing context
+
+    * avoid duplicating parameters
+    * requires some runtime support
 
 ### worksheet
 
