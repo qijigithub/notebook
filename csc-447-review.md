@@ -1198,11 +1198,50 @@ int main (void) {
 * runtime support for nested function 
   * nested function declarations not allowed in C
 * why nested function?
-  * Inner functions may be anonymous,sometimes aids clarity
+  * Inner functions may be anonymous, sometimes aids clarity
   * Access variables from enclosing context
     * avoid duplicating parameters
     * requires some runtime support
-    * 
+  * potential problem
+    * inner function have same variable name with outer function
+    * scope of inner function and outer function
+  * why has this problem?
+    * when inner function is called, outer function still allocation, but when inner function return inner function cannot variable cannot be reached
+    * when inner function are used twice, and using reference to remember that value, the first time outer function variable may be deallocated and cover by other value. This because stack deallocate after first time return.
+      * solve:block copy and block release, copy g to heap to keep function variable
+  * need solve:
+    * inner function how to reach out function?
+      * inner function block can reach outer variable, because outer function doesn't  deallocate
+  * scala work well in the problem
+    * because, instead of block copy, scala has closures to store, which is same to object.
+  * closure
+    * Closures store inner function and environment
+    * Environment contains variables from enclosing scope
+    * Lifetime of environment = lifetime of inner function
+      * environment is allocated on the heap
+    * environment has a mutable variable
+      * Closure contains
+        * pointer/reference to code for `inner`
+        * copy of `x`
+        * reference to shared `u` \(on heap\)
+
+```scala
+def outer (x:A) : B=>C = {
+  var u:A = x
+  def inner (y:B) : C = {
+    ...use u and y...
+  }
+  u = u + 1
+  inner
+} 
+```
+
+* example
+
+```text
+val f:()=>Int = {var x= -1; () => { x = x + 1; x}}
+val g:Int=>()=>Int = (y) => {var z= y; () => { z = z + 1; z}}
+```
 
 ### worksheet
 
