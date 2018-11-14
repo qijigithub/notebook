@@ -1455,7 +1455,7 @@ new emplyee()
   * JS is not class-based: no class definition
   * Object literals have properties \(`name`, `age`, `addr`\)
   * JSON: javascript object noation
-  * javascript OOP
+  * javascript OOP and add field dynamically and modify exsiting field properly
 
 ```javascript
 // Object literal with no contents
@@ -1467,15 +1467,73 @@ var person = {
   age: 50,
   addr: "243 S Wabash Ave"
 };
+
 ```
 
 * * keys are always Strings
+  * {}: empty object and empty expression
   *  it you call the method or field is not there
     * in java: compiler error 
     * javascript
-      * object: undefined
+      * object even \({}\)\(empty object\): undefined
       * varible:not a object: cannot read property of "variable" of undefined
       * undefined variable: "variable" is not defined
+  * enmerate properties: specical iterate syntax
+
+```text
+var person = {
+  name: "Alice",
+  age: 50,
+  addr: "243 S Wabash Ave"
+};
+
+for (p in person) {
+  console.log (p + ": " + person[p]);
+}
+```
+
+* Function: no different between function and mehtod
+
+```javascript
+//object counter with field n and fucntion get
+var counter = { n: 0, get: function () { return this.n++; } };
+// n is in inner function,so have specify this
+var counter = { n: 0, get () { return this.n++; } };
+```
+
+* encapsulation for object
+  * Encapsulation via private fields/methods for PLs
+  * JS properties cannot be declared private
+    * no classes
+    * which code could access "private" properties?
+      * inner function local variable 
+
+```javascript
+//return an object with a function
+function createCounter () {
+  var n = 0;
+  return {
+    get: function () { return n++; } // n++ NOT this.n++
+  };
+};
+
+var counter = createCounter ();
+counter.get ();
+```
+
+```scala
+//scala version just return a function, extreact function from object
+def createCounter () : () => Int = {
+  var n = 0
+  () => { val retVal = n; n = n + 1; retVal }
+}
+
+val counter = createCounter () 
+counter ()
+```
+
+* jquery is a libary for javascript
+*  continue javascript OOD
 
 ### worksheet
 
