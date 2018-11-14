@@ -1243,6 +1243,12 @@ val f:()=>Int = {var x= -1; () => { x = x + 1; x}}
 val g:Int=>()=>Int = (y) => {var z= y; () => { z = z + 1; z}}
 ```
 
+*  problem of closure function:
+  * how to safely save the result? because the value diappear with the stack storage
+    * in c, it stores in block, which is heap;in scala, it stores in closure
+  * if a variable in outer function is mutable, inner function need to use it and change it, how to do it?
+    * closure contain this variable as reference, shared with outer function and inner function.
+
 ### worksheet
 
 ### homework
@@ -1272,6 +1278,204 @@ val g:Int=>()=>Int = (y) => {var z= y; () => { z = z + 1; z}}
 ## Lecture8
 
 ### class notes
+
+#### More scope
+
+* in c
+
+```text
+//The second  int x=x+1 is first int x, then execute x+1,so x is not initialize in the program
+int main (void) {
+  int x = 10;
+  {
+    int x = x + 1;
+    printf ("x = %08x\n", x);
+  }
+  return 0;
+}
+```
+
+* in scala,  `val x:Int= x*1`
+  * x is initialized  to 0 first when declaration, and then executing x\*1, result is 0.
+* Scala stream: more complex definition, recursive definition
+
+```scala
+//worong recursive definition: when declared xs,xs is initialized as null, 
+//and we use xs in right part, this time xs is still null,and not Nil,so nullpointerException
+scala> val xs:List[Int] = 1 :: xs
+java.lang.NullPointerException
+  ... 28 elided
+```
+
+we can try by using class case version list, it is still wrong.
+
+* Solving: try to delay evaluation of list tail, stream do it !
+* Stream: consider second parameter by name.
+* `#::` is non-strict in right-hand argument
+
+```scala
+//principle: using function to delay the evaluation of tail
+scala> case class T(head:Int, tail:()=>T)
+defined class T
+
+scala> val ts:T = T(1, ()=>ts)
+ts: T = T(1,$$Lambda$1324/2038353966@4d500865)
+
+scala> ts.tail().tail().head
+res14: Int = 1
+// stream way:
+scala> val ones:Stream[Int] = 1 #:: ones
+ones: Stream[Int] = Stream(1, ?)
+
+scala> ones.take (5)
+res0: scala.collection.immutable.Stream[Int] = Stream(1, ?)
+
+scala> ones.take (5).toList
+res1: List[Int] = List(1, 1, 1, 1, 1)
+```
+
+* **dynamic and static scope**
+* problem: 
+  * inner function may have to use the variable which come from outer variable. if there are variables   using same name with outer variable,which one should the function use?
+  * globle varible and local varible have same name in a function, ,when function use this name as variable, use which variable?
+    * 1 possibility: using local variable in function and print global variable,beacause function is using the most recently declared variable ---- dynamic 
+    * 2 possibility: using globle variable in function and print global variable,because x is bound to global x ----static
+
+```c
+//dynamic scope language print 0
+//static scope language print 1
+var x:Int = 0
+def foo () {
+  x = x + 1
+}
+def bar () {
+  var x:Int = 0
+  foo ()
+}
+bar ()
+println (x)
+```
+
+* static scope: identifiers are bound to the **closest binding occurrence in an enclosing block of the program code.** 
+* dynamic scope:identifiers are bound to **the binding occurrence in the closest activation record.**
+* dynamic scope language:lisp but common lisp fixed it 
+* static scope language:scheme,scala, java, python
+
+#### case  study:Javascript \(scope and function\)
+
+* backgroud summary
+  * dynamically-typed: compile time no error, just happen in runtime
+  * object-oriented
+  * functional
+  * Runs in browsers and elsewhere with [Node.js](https://nodejs.org/en/)
+  * use more functional  more than object
+  * evloved fast
+* javascript development option: jsbin
+* document object model
+  * DOM tree model of HTML document
+  * Browser displays runtime changes to DOM tree
+  * JS introduced for manipulating DOM tree
+  * Callback functions for event handling
+* JS WAT\(horrible part\)
+* syntax
+  * print:console.log \(1 + 2\);
+  * doucument: be deplay in the browser
+  * function:
+
+```javascript
+function f (x) {
+  console.log ("Called with " + x);
+  return x + 1;
+}
+
+f (5);
+ 
+```
+
+* **javascript scope and closures**
+
+```javascript
+//the declara of a in function f is hoisted in top of function f 
+var a = 1;
+function f () {
+  console.log ("f1: a = " + a);
+  { var a = 2;
+    console.log ("f2: a = " + a);
+} }
+function main() {
+  console.log ("m1: a = " + a);
+  f ();
+  console.log ("m2: a = " + a);
+
+output: 
+1
+undefined
+2 
+1
+```
+
+* javascript scope
+  * hoisting: the enclosing declared a varaible, the declaration will be hoisted to top of function,and initialize to "undefined", even if I have a condition and condition is false.
+  * let: is  fixed this let x,is in the block it should be 
+* collection processing
+  * var xs = \[ 11, 21, 31 \]; 
+  * xs.map \(x =&gt; \(2 \* x\)\); \[22,42,62\]
+  * xs.filter \(x =&gt; x%7===0\) :\[21\]
+  * xs.reduce \(\(\(z,x\) =&gt; z+x\), 0\): 0+11+21+31
+* common scope problem
+  * if I want both inner and outer function can change a variable, then create a closure
+  * if I want the variable only can change in outer function and stop change in inner function, we can use  blcok scope: let 
+    * of no let, we can use IIFE, which create a scope that local variable can only survive in inner function
+
+```javascript
+var funcs = [];
+for (var i = 0; i < 5; i++) {
+//the function here is for give me a scope, so that x can only survive in the scope?
+  (function () { 
+    var x = i;
+    funcs.push (function () { return x; });
+  }) ();
+}
+console.log (funcs[0] ()); // prints 0
+```
+
+* **javascript object oriented**
+  * java OOP 
+
+```java
+//define a object in java
+class employee{
+    String name;
+    Int id;   
+}
+new emplyee() 
+```
+
+* javascript is different:
+  * JS is not class-based: no class definition
+  * Object literals have properties \(`name`, `age`, `addr`\)
+  * JSON: javascript object noation
+  * javascript OOP
+
+```javascript
+// Object literal with no contents
+var empty = {};
+
+// Object literal with three properties
+var person = {
+  name: "Alice",
+  age: 50,
+  addr: "243 S Wabash Ave"
+};
+```
+
+* * keys are always Strings
+  *  it you call the method or field is not there
+    * in java: compiler error 
+    * javascript
+      * object: undefined
+      * varible:not a object: cannot read property of "variable" of undefined
+      * undefined variable: "variable" is not defined
 
 ### worksheet
 
