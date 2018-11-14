@@ -1269,6 +1269,92 @@ val g:Int=>()=>Int = (y) => {var z= y; () => { z = z + 1; z}}
 
 ### class notes
 
+#### nested class
+
+```java
+//interface has a apply function, taking t and return u
+//class c has a function f, return I type, inside the function, create a I type object and
+// inside I, there a function override function in I ,which is an anonymous inner class.
+//it actually is  a closure and can use x and t. and then return I
+interface I {
+  U apply (T t); // for some types T and U
+}
+
+class C {
+  I f () {
+    int x = 0;
+    I a = new I () { // new instance of anonymous class implementing I
+      public U apply (T t) { 
+        // can use x from enclosing scope, and t parameter
+      }
+    };
+    return a;
+  }
+}
+```
+
+* we can bring it out
+
+```text
+interface I {
+  U apply (T t); // for some types T and U
+}
+
+class D implements I {
+  final int x;              
+  D (int x) { this.x = x; } 
+  public U apply (T t) { /* can use x in field, and t parameter */ }
+}
+
+class C {
+  I f () {
+    int x = 0;
+    I a = new D (x); // new instance of named class implementing I
+    return a;
+  }
+}
+```
+
+* java concurrency
+
+```java
+package java.lang;
+
+@FunctionalInterface
+public interface Runnable {
+  void run ();
+}
+
+class Thread {
+  Thread (Runnable target); // Allocates a new Thread object
+  ...
+}
+...
+new Thread (new Runnable () {
+  public void run () { /* packaged code here */ }
+}).start ();
+```
+
+* scala using java concurrency
+
+```text
+val threads : List[Thread] = {
+  for (i <- (1 to 26).toList) yield {
+    val ch : Byte = ('A' + i - 1).asInstanceOf[Byte]
+    new Thread (new Runnable {
+      def run () = {
+        while (true) { System.out.write (ch) }
+      }
+    })
+  }
+}
+for (t <- threads) { t.start }
+```
+
+#### L-value
+
+#### argument passing
+
 ### worksheet
 
 ### homework
@@ -1554,6 +1640,14 @@ counter ()
       * function in object is a closure,  closures aren't bind "this", this is bound to the globle object
       * 2:30:07
 
+### homework
+
+### quiz
+
+## Lecture9
+
+### class notes
+
 #### dynamic dispatch
 
 * encapsulation
@@ -1643,22 +1737,51 @@ public class Driver {
           * `List[Nothing]<:List[X]`
     * List
       * Subtyping for Scala lists: If `Y<:X` then `List[Y]<:List[X]`
-    * **COVARIANCE**
+    * **COVARIANCE:referent to same thing, but have different type parameter**
       * `List` said to be covariant， arrays is not covariant
 
         Generally, `C[-]` is covariant if and only if
 
         * `Y<:X` implies `C[Y]<:C[X]`
-    * **invariant**
-    * **scala array**
+    * invariant
+      * scala array invariant
 
-### homework
+```scala
+class B {
+  def f (x:Int) : Int             = 1 
+}
 
-### quiz
+class C extends B {
+  override def f (x:Int) : Int    = 2
+  def g () : Int                  = 3
+}
 
-## Lecture9
+val xs1:Array[B] = Array (new B, new B) // OK
+val xs2:Array[C] = Array (new C, new C) // OK
+val xs3:Array[B] = Array (new B, new C) // OK, because C <: B
+val xs4:Array[B] = xs2 // Not allowed; following steps must not occur
+xs4 (0) = new B        // OK, because xs4:Array[B]
+xs2 (0).g ()           // OK because xs2 (0) : C (statically)
+                       // but fails because xs2 (0) : B (dynamically)
+```
 
-### class notes
+cannot have two different reference to same array
+
+* scala not allow upcasting and downcasting
+* java  array convariant
+
+```java
+public class Driver {
+  public static void main (String[] args) {
+    C[] xs2 = new C[] { new C (), new C () };
+    B[] xs4 = xs2;     // Uses covariance of Java arrays
+    xs4[0] = new B (); // Compiles OK, fails at runtime
+    xs2[0].g (new String[] { }); 
+  }
+}
+```
+
+* java allow upcastign and downcasting, not allow change
 
 ### worksheet
 
@@ -1669,6 +1792,25 @@ public class Driver {
 ## Lecture10
 
 ### class notes
+
+#### inheritance
+
+* subtyping:  one type can be used as different type,  bird is a canary
+* inheritance: reuse  the code
+* delegation id different from inheritance 
+
+#### case study: c++ and vtable
+
+* OO feather
+  * object heap allocation:Counter C
+  * object stack allocation:Cunter \*p=new Counter\(\);
+* inheritance
+  * fields
+* dispatch
+  * default: static dispatch
+  * dynamic dispatch: virtual
+
+
 
 ### worksheet
 
