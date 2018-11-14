@@ -1359,17 +1359,17 @@ println (x)
 * static scope: identifiers are bound to the **closest binding occurrence in an enclosing block of the program code.** 
 * dynamic scope:identifiers are bound to **the binding occurrence in the closest activation record.**
 * dynamic scope language:lisp but common lisp fixed it 
-* static scope language:scheme,scala, java, python
+* static scope language: scheme ,scala, java, python
 
 #### case  study:Javascript \(scope and function\)
 
-* backgroud summary
+* background summary
   * dynamically-typed: compile time no error, just happen in runtime
   * object-oriented
   * functional
   * Runs in browsers and elsewhere with [Node.js](https://nodejs.org/en/)
   * use more functional  more than object
-  * evloved fast
+  * evolved fast
 * javascript development option: jsbin
 * document object model
   * DOM tree model of HTML document
@@ -1379,7 +1379,7 @@ println (x)
 * JS WAT\(horrible part\)
 * syntax
   * print:console.log \(1 + 2\);
-  * doucument: be deplay in the browser
+  * document: be displayed in the browser
   * function:
 
 ```javascript
@@ -1415,8 +1415,8 @@ undefined
 ```
 
 * javascript scope
-  * hoisting: the enclosing declared a varaible, the declaration will be hoisted to top of function,and initialize to "undefined", even if I have a condition and condition is false.
-  * let: is  fixed this let x,is in the block it should be 
+  * hoisting: the enclosing declared a variable, the declaration will be hoisted to top of function, and initialize to "undefined", even if I have a condition and condition is false.
+  * let: is  fixed this let x, is in the block it should be 
 * collection processing
   * var xs = \[ 11, 21, 31 \]; 
   * xs.map \(x =&gt; \(2 \* x\)\); \[22,42,62\]
@@ -1476,7 +1476,7 @@ var person = {
     * in java: compiler error 
     * javascript
       * object even \({}\)\(empty object\): undefined
-      * varible:not a object: cannot read property of "variable" of undefined
+      * variable:not a object: cannot read property of "variable" of undefined
       * undefined variable: "variable" is not defined
   * enmerate properties: specical iterate syntax
 
@@ -1492,7 +1492,7 @@ for (p in person) {
 }
 ```
 
-* Function: no different between function and mehtod
+* Function: no different between function and method
 
 ```javascript
 //object counter with field n and fucntion get
@@ -1532,10 +1532,125 @@ val counter = createCounter ()
 counter ()
 ```
 
-* jquery is a libary for javascript
+* jquery is a library for javascript
 *  continue javascript OOD
+* delegation/prototype based inheritance
+  * problem
+    *  employee application, how do they diff?diff name, salary. how do they same? same function, increaseSalary\(\), change\(\)
+    * original class
+      * Attribute:separate
+      * function: share
+      * new objects have separate place to store field and a link to function, and a shared place to store function code
+    * but javascript, they don"t have class
+    * solving: delegation
+      *  embedding class as object, and store method in here, a pointer called prototype
+  * this
+    * JS binds `this` based on calling context. See [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)
+      * `o.m()` is method context, `this===o`
+      * `f()` is function context, `this===global/window`
+      * `new C()` is constructor context, `this` is new object
+  * function is  method in javascript
+    * problem 2
+      * function in object is a closure,  closures aren't bind "this", this is bound to the globle object
+      * 2:30:07
 
-### worksheet
+#### dynamic dispatch
+
+* encapsulation
+  * private: object in this class can see
+* direct calls:refer to callee directly by name
+  * indirect call:C allows indirection to code via function pointers
+  * diff: in assembly: direct just name where we will going; indirect we put  the place in the register, and then we jump to the value stored in register
+* example of indirect call
+
+```text
+//indirect calls:A type of array should bind with A function,
+// but it return its actual time of function, so it is dynamic dispatch
+class A           { void foo () { System.out.println ("A"); } }
+class B extends A { void foo () { System.out.println ("B"); } }
+class C extends A { void foo () { System.out.println ("C"); 
+
+public class Driver {
+  public static void main (String[] args) { 
+    A[] as = { new B(); new C (); }
+    for (A x : as)
+      x.foo ();
+  }
+}
+
+```
+
+* 😂:dynamic dispatch: object and function\(\) binding together; if it occur in runtime, it is dynamic dispatch; if it occur in compile time, it is static binding
+* Java / Scala anon. functions use dynamic dispatch,Implementation of dynamic dispatch in C++ soon
+
+#### subtyping
+
+* interface=contact
+  * Informal usage for dynamically-typed PLs
+
+    * documentation describes what is allowed
+    * dynamic errors may occur if the interface is not obeyed or the interface was incorrect
+      * dynamic typed PL, they only talk about what field they has, properties they have 
+      *  if you don't have this properties, the dynamic error occur
+
+    Formal usage for statically-typed PLs
+
+    * static checks that data uses interfaces correctly
+    * to eliminate dynamic errors
+    *  These slides apply to statically-typed PL
+* focus on static typed language
+  * subtyping :c have all the properties of B \(canry and bird\)
+    * C&lt;:B
+    * scala: from nothing to any
+  * subtyping and substitution
+    * upcasting
+      * If `Y<:X` and `e:Y`, then `e:X` also
+        * \(because `e` satisfies the contract for type `X`\)
+        * if someone wants a bird, he is happy to get a canry
+        * This substitution is sometimes called upcasting
+    * downcasting
+      * Downcasting is potentially unsafe
+        * requires explicit cast in Java, Scala, etc.
+        * also requires storing type at runtime
+        * downcast introduces a dynamic check \(Java\)
+      * subtyping preorder
+        * Subtyping relation `<:` is a preorder on types
+          * reflexive - `X<:X`
+          * transitive - if `X<:Y` and `Y<:Z` then `X<:Z`
+    * `PL`
+      * `top`
+        * Some PLs have a `Top` type
+
+          * `X<:Top` \(greater than all other types\)
+
+          In Java - `java.lang.Object` above reference types
+
+          In Scala - `scala.Any` above all types
+
+        * In Scala - `scala.AnyRef` above reference types
+      * bottom
+        * Most PLs do not have a `Bottom` type
+
+          * `Bottom<:X` \(less than all other types\)
+
+          Recall [Scala type hierarchy](http://fpl.cs.depaul.edu/jriely/courses/csc447/assets/images/ScalaClassHierarchy_New.png)
+
+          In Scala - `Bottom` is `scala.Nothing`
+
+          Important for typing uses of `Nil`
+
+          * `Nil:List[Nothing]`
+          * `List[Nothing]<:List[X]`
+    * List
+      * Subtyping for Scala lists: If `Y<:X` then `List[Y]<:List[X]`
+    * **COVARIANCE**
+      * `List` said to be covariant， arrays is not covariant
+
+        Generally, `C[-]` is covariant if and only if
+
+        * `Y<:X` implies `C[Y]<:C[X]`
+    * **invariant**
+    * **scala array**
 
 ### homework
 
