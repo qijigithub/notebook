@@ -1259,7 +1259,9 @@ val g:Int=>()=>Int = (y) => {var z= y; () => { z = z + 1; z}}
 
 ### class notes
 
-### worksheet
+#### 
+
+### orksheet
 
 ### homework
 
@@ -1352,6 +1354,32 @@ for (t <- threads) { t.start }
 ```
 
 #### L-value
+
+* R-MODE AND L -MODE
+  * R-MODE: Right-hand `x` denotes value read from storage location
+  * L-MODE:Left-hand `x` denotes the storage location 
+  * temporary value is not l value
+* call by value
+  * For `g(x)` with `x = 5`
+
+    `x` evaluates to `5`
+
+    a location containing `5` is given to `g`
+
+    location is different to that of `x`!
+* call by reference
+  * Some PLs use call-by-reference \(CBR\)
+  * To run `g (e)`
+    * evaluate `e` to an l-value `r`
+    * pass the l-value `r` to `g`
+    * callee changes via `r` are visible to caller
+* Can temporary values be passed as l-values?
+  * `f(x+1)` is not obviously legitimate in CBR
+* **SCALA: PASSING A FUNCTION**
+  * Scala allows functions as parameters
+  * A function that takes no arguments can be seen as a delayed value, also called a thunk
+  * Scala has a special syntax for using thunks as parameters, Call-by-name parameters are non-strict
+  * 
 
 #### argument passing
 
@@ -1626,19 +1654,48 @@ counter ()
     * original class
       * Attribute:separate
       * function: share
+        * function create a local variable,varible and function share the memory, but when new a object, it will start over
       * new objects have separate place to store field and a link to function, and a shared place to store function code
     * but javascript, they don"t have class
     * solving: delegation
       *  embedding class as object, and store method in here, a pointer called prototype
   * this
-    * JS binds `this` based on calling context. See [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)
+    * JS binds `this` based on calling context. 
       * `o.m()` is method context, `this===o`
       * `f()` is function context, `this===global/window`
       * `new C()` is constructor context, `this` is new object
   * function is  method in javascript
     * problem 2
-      * function in object is a closure,  closures aren't bind "this", this is bound to the globle object
-      * 2:30:07
+      * function in object is a closure,  closures aren't bind "this", this is bound to the globle object, but scala different
+
+```text
+//javascript return a function, which create a closure, the closure is not bind this,
+//so the closure is not bind o
+var o = {
+  v : 5,
+  add : function (xs) {
+    return xs.map(function(x){ return this.v + x; });
+  }
+}
+o.add([10,20,30]) // [ NaN, NaN, NaN ]
+```
+
+* * solution:
+
+```text
+var o = {
+  v : 5,
+  add : function (xs) {
+    return xs.map(function(x){ return this.v + x; }.bind(this));
+  }
+}
+o.add([10,20,30]) // [ 15, 25, 35 ]
+```
+
+* js view properties
+* js object is separate, function are shared
+  * js object cointains propertie of the object and the properties of prototype,so that fucntion can be share
+  * 
 
 ### homework
 
