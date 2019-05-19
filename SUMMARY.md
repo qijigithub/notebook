@@ -3,4 +3,6 @@
 * [Introduction](README.md)
 * [data structure review in java](data-structure-review-in-java.md)
 * [CSC 447 review](csc-447-review.md)
+* [OOP design pattern](oop-design-pattern.md)
+* [Untitled](untitled.md)
 
